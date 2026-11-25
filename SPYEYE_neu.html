@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07111f">
+<title>SPYEYE — See the world. Live.</title>
+<style>
+
+:root{--bg:#030914;--panel:rgba(8,22,40,.88);--panel2:#0c2540;--line:rgba(83,190,255,.22);--text:#effaff;--muted:#91abc5;--cyan:#56e5ff;--blue:#4c8dff;--green:#72f3c0;--violet:#a78bfa}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 50% -15%,#17466a 0,#0a1b31 30%,#030914 72%);color:var(--text);font:15px/1.48 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh;position:relative;overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;opacity:.22;background-image:linear-gradient(rgba(82,183,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(82,183,255,.08) 1px,transparent 1px);background-size:44px 44px;mask-image:linear-gradient(to bottom,black,transparent 85%)}
+body:after{content:"";position:fixed;width:520px;height:520px;right:-250px;top:18%;border:1px solid #4bcfff22;border-radius:50%;box-shadow:0 0 0 35px #4bcfff08,0 0 0 80px #4bcfff05;pointer-events:none;z-index:-1}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.top{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 22px;background:rgba(3,10,21,.82);border-bottom:1px solid var(--line);backdrop-filter:blur(22px);box-shadow:0 8px 30px #0004}
+.brand{display:flex;align-items:center;gap:11px;font-weight:950;letter-spacing:2px;font-size:19px;text-shadow:0 0 22px #56e5ff55}
+.brandmark{width:39px;height:39px;border-radius:13px;display:grid;place-items:center;border:1px solid #56e5ff88;color:var(--cyan);font-size:25px;background:linear-gradient(145deg,#123b58,#071626);box-shadow:0 0 25px #51dcff30,inset 0 0 15px #51dcff12}
+.brand span:last-child b{color:var(--cyan)}
+.topright{display:flex;align-items:center;gap:9px}
+.pill{font-size:10px;letter-spacing:1.5px;color:var(--green);border:1px solid #68e6b255;border-radius:30px;padding:7px 11px;background:#68e6b20b}
+.btn{border:1px solid #2d6283;background:linear-gradient(145deg,#102b46,#0a1b2e);color:var(--text);border-radius:11px;padding:10px 13px;transition:.2s;box-shadow:0 4px 15px #0002}
+.btn:hover{border-color:var(--cyan);box-shadow:0 0 18px #51dcff25;transform:translateY(-1px)}
+.btn.primary{background:linear-gradient(115deg,#087d9e,#175caa 65%,#4c5fc7);border-color:#5de5ff99;box-shadow:0 0 24px #23bfe833;color:white;font-weight:700}
+.btn.small{font-size:12px;padding:7px 9px}
+main{max-width:1540px;margin:auto;padding:20px;display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:17px}
+.panel{background:linear-gradient(145deg,rgba(11,29,50,.94),rgba(5,17,32,.94));border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:0 20px 70px #0006,0 0 30px #2bbfff0a;position:relative}
+.panel:before{content:"";position:absolute;left:18px;right:18px;top:0;height:1px;background:linear-gradient(90deg,transparent,#56e5ff88,transparent);pointer-events:none}
+.maphead{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:17px 19px;border-bottom:1px solid var(--line);background:linear-gradient(90deg,#102b451c,transparent)}
+h1{font-size:19px;margin:0 0 3px;letter-spacing:.3px}.muted{color:var(--muted)}.tiny{font-size:11px}
+#globe{width:100%;height:min(67vh,700px);min-height:390px;background:radial-gradient(ellipse at 50% 48%,#102c47,#050e1a 68%)}
+.maptools{display:flex;flex-wrap:wrap;gap:8px;padding:13px;border-top:1px solid var(--line);background:#061321}
+.field{min-width:0;background:#0b2035;border:1px solid #28516f;color:var(--text);border-radius:11px;padding:11px 12px;outline:none}
+.field:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #51dcff15}
+#search{flex:1;min-width:170px}
+select.field{min-width:135px}
+.side{padding:17px;display:flex;flex-direction:column;gap:13px}
+.side h2{font-size:16px;margin:0;letter-spacing:.3px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.stat{padding:13px;background:linear-gradient(145deg,#102d49,#0a1d31);border:1px solid #28516f;border-radius:13px;box-shadow:inset 0 1px #ffffff08}
+.stat strong{display:block;font-size:25px;color:var(--cyan);line-height:1.1;text-shadow:0 0 18px #51dcff55}
+.stat span{font-size:10px;color:var(--muted);letter-spacing:.7px;text-transform:uppercase}
+.camlist{display:flex;flex-direction:column;gap:8px;max-height:330px;overflow:auto;padding-right:2px}
+.camitem{width:100%;text-align:left;background:linear-gradient(100deg,#102a43,#0a1d31);border:1px solid #244561;border-radius:12px;padding:11px;color:var(--text);transition:.18s}
+.camitem:hover,.camitem.active{border-color:var(--cyan);box-shadow:0 0 18px #51dcff18,inset 0 0 0 1px #51dcff33}
+.camitem b{display:block;font-size:13px}.camitem small{color:var(--muted)}
+.detail{background:linear-gradient(145deg,#102b46,#091b2e);border:1px solid #2b526f;border-radius:14px;padding:13px;min-height:140px}
+.detail h3{font-size:16px;margin:0 0 5px}.detail p{font-size:12px;color:var(--muted);margin:5px 0}
+.player{width:100%;aspect-ratio:16/9;background:radial-gradient(ellipse,#102a42,#02070d 70%);border:1px solid #2d5877;border-radius:11px;overflow:hidden;margin-top:10px;display:grid;place-items:center;color:#8ea6bd;font-size:12px;text-align:center}
+.player iframe,.player video,.player img{width:100%;height:100%;border:0;object-fit:contain}
+.ad{border:1px dashed #4b7697;border-radius:13px;padding:15px;text-align:center;color:#a0bad2;font-size:11px;min-height:78px;display:grid;place-content:center;gap:3px;background:linear-gradient(120deg,#102b4422,#51dcff08)}
+.note{font-size:11px;color:var(--muted);line-height:1.6;background:#0b2035;border:1px solid #1c3d59;border-radius:12px;padding:12px}
+footer{max-width:1540px;margin:auto;padding:0 20px 26px;color:#718ba5;font-size:11px}
+.modalback{position:fixed;inset:0;background:#000c;z-index:30;display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(9px)}
+.modalback.open{display:flex}
+.modal{width:min(560px,100%);max-height:90vh;overflow:auto;background:linear-gradient(145deg,#102b46,#071625);border:1px solid #3b779c;border-radius:19px;padding:19px;box-shadow:0 25px 90px #000c,0 0 30px #51dcff18}
+.modal h2{margin:0 0 6px;font-size:19px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:15px 0}
+.formgrid label{font-size:11px;color:var(--muted);display:flex;flex-direction:column;gap:5px}
+.formgrid .wide{grid-column:1/-1}
+.formgrid input,.formgrid select{width:100%;min-width:0}
+.modalactions{display:flex;justify-content:flex-end;gap:8px}
+.empty{font-size:12px;color:var(--muted);padding:12px;text-align:center}
+@media(max-width:900px){main{grid-template-columns:1fr;padding:11px}.side{display:grid;grid-template-columns:1fr 1fr}.side h2,.camlist,.detail,.note,.ad{grid-column:1/-1}#globe{height:55vh;min-height:340px}.camlist{max-height:240px}}
+@media(max-width:560px){.top{padding:11px 12px}.pill{display:none}.brand{font-size:16px}main{padding:8px;gap:10px}.side{display:flex;padding:13px}.maphead{padding:13px}.maphead .muted{max-width:210px}#globe{height:49vh;min-height:320px}.formgrid{grid-template-columns:1fr}.formgrid .wide{grid-column:auto}}
+
+
+.navtabs{max-width:1540px;margin:18px auto 0;padding:0 20px;display:flex;gap:8px;flex-wrap:wrap}
+.tracking{max-width:1500px;margin:18px auto 22px;width:calc(100% - 40px)}
+.trackframe{height:min(72vh,760px);min-height:430px;background:#061321}
+.trackframe iframe{width:100%;height:100%;border:0;background:#061321}
+.tracking .maptools{align-items:center;justify-content:space-between}
+[hidden]{display:none!important}
+@media(max-width:560px){.navtabs{padding:0 8px;margin-top:10px}.tracking{width:calc(100% - 16px);margin:10px 8px}.trackframe{height:65vh;min-height:390px}}
+
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><div class="brandmark">◎</div><div>SPY<b>EYE</b><small style="display:block;font-size:9px;letter-spacing:3px;color:var(--muted);font-weight:600">SEE THE WORLD. LIVE.</small></div></div>
+  <div class="topright"><span class="pill">GLOBAL LIVE VIEW</span><button class="btn primary" id="addOpen">＋ Kamera hinzufügen</button></div>
+</header>
+<nav class="navtabs" aria-label="SPYEYE Bereiche">
+ <button class="btn primary" id="camsTab">◎ LIVE CAMS</button>
+ <button class="btn" id="planesTab">✈ FLUGZEUGE</button>
+ <button class="btn" id="shipsTab">◈ SCHIFFE</button>
+</nav>
+<main id="camsView">
+<section class="panel">
+  <div class="maphead">
+    <div><h1>Dein Fenster zur Welt</h1><div class="muted tiny">Entdecke faszinierende Orte rund um den Globus</div></div>
+    <div class="tiny" style="color:var(--green);letter-spacing:1px">✦ LIVE EXPLORER</div>
+  </div>
+  <div id="globe" aria-label="Interaktiver Globus"></div>
+  <div class="maptools">
+    <input class="field" id="search" type="search" placeholder="Kamera, Stadt oder Land suchen …">
+    <select class="field" id="category">
+      <option value="Alle">Alle Kategorien</option><option>Stadt</option><option>Strand</option><option>Berge</option><option>Verkehr</option><option>Natur</option><option>Sonstiges</option>
+    </select>
+    <button class="btn" id="reset">Globus zurücksetzen</button>
+  </div>
+</section>
+<aside class="panel side">
+  <h2>Livecam-Explorer</h2>
+  <div class="stats">
+    <div class="stat"><strong id="total">0</strong><span>Kameras gespeichert</span></div>
+    <div class="stat"><strong id="livecount">0</strong><span>Mit Videolink</span></div>
+  </div>
+  <div class="tiny muted">KAMERAS AUF DEM GLOBUS</div>
+  <div class="camlist" id="camlist"><div class="empty">Noch keine eigenen Kameras hinzugefügt. Beispielorte auf dem Globus sind keine echten Livecams.</div></div>
+  <div class="detail" id="detail">
+    <h3>Noch keine Kamera ausgewählt</h3>
+    <p>Füge eine öffentliche Webcam hinzu, deren Betreiber das Einbetten erlaubt. Sie erscheint danach als Punkt auf dem Globus.</p>
+    <div class="player">Hier erscheint der ausgewählte Stream.</div>
+  </div>
+  <div class="note"><b style="color:var(--text)">Öffentliche Livecam-Verzeichnisse</b><br>
+   <a href="https://overlookcams.com/" target="_blank" rel="noopener" style="color:var(--cyan)">Overlook Cams – Webcam-Verzeichnis ↗</a><br>
+   <a href="https://livepublicwebcams.com/de/" target="_blank" rel="noopener" style="color:var(--cyan)">LivePublicWebcams – öffentliche Streams ↗</a>
+  </div>
+  <div class="note"><b style="color:var(--text)">So funktioniert das Hinzufügen</b><br>Du brauchst den Namen, das Land, die ungefähren Koordinaten und einen erlaubten YouTube-Live-Einbettungslink. Deine Einträge werden in diesem Browser auf diesem Gerät gespeichert.</div>
+  <div class="ad"><b>WERBEPLATZHALTER</b><span>Hier kann später rechtmässig eingebundene Werbung erscheinen.</span></div>
+</aside>
+</main>
+<section class="tracking panel" id="planesView" hidden>
+ <div class="maphead"><div><h1>Flugzeug-Tracking</h1><div class="muted tiny">Öffentliche ADS-B-Daten – Abdeckung und Aktualität variieren.</div></div><span class="pill">✈ AIR TRAFFIC</span></div>
+ <div class="trackframe"><iframe title="Öffentliche Flugzeugkarte" src="https://globe.adsb.lol/" loading="lazy" referrerpolicy="no-referrer"></iframe></div>
+ <div class="maptools"><a class="btn primary" href="https://globe.adsb.lol/" target="_blank" rel="noopener">Flugzeugkarte in neuem Tab öffnen ↗</a><span class="tiny muted">Datenquelle: adsb.lol · ODbL 1.0</span></div>
+</section>
+<section class="tracking panel" id="shipsView" hidden>
+ <div class="maphead"><div><h1>Schiffs-Tracking</h1><div class="muted tiny">Öffentliche AIS-Daten von empfangenden Community-Stationen.</div></div><span class="pill">◈ MARITIME</span></div>
+ <div class="trackframe"><iframe title="Öffentliche Schiffs-Trackingkarte" src="https://www.aiscatcher.org/livemap" loading="lazy" referrerpolicy="no-referrer"></iframe></div>
+ <div class="maptools"><a class="btn primary" href="https://www.aiscatcher.org/livemap" target="_blank" rel="noopener">Schiffskarte in neuem Tab öffnen ↗</a><span class="tiny muted">Datenquelle: AIS-catcher Community</span></div>
+</section>
+<footer>
+  SPYEYE · SEE THE WORLD. LIVE. Öffentliche Streams und Tracking-Daten können ausfallen oder regional unvollständig sein. Nur öffentlich freigegebene Kameras verwenden. Eigene Kameraeinträge werden lokal in diesem Browser gespeichert.
+</footer>
+
+<div class="modalback" id="modal">
+  <div class="modal">
+    <h2>Öffentliche Kamera hinzufügen</h2>
+    <p class="tiny muted">Nur Kameras hinzufügen, deren Betreiber das Einbetten ausdrücklich erlauben. Verwende einen YouTube-Live-Link oder einen YouTube-Einbettungslink.</p>
+    <form id="cameraForm">
+      <div class="formgrid">
+        <label>Kameraname<input class="field" name="title" required maxlength="70" placeholder="z. B. Stadtplatz Live"></label>
+        <label>Land / Ort<input class="field" name="place" required maxlength="70" placeholder="z. B. Zürich, Schweiz"></label>
+        <label>Breitengrad<input class="field" name="lat" type="number" step="any" min="-90" max="90" required placeholder="47.3769"></label>
+        <label>Längengrad<input class="field" name="lng" type="number" step="any" min="-180" max="180" required placeholder="8.5417"></label>
+        <label>Kategorie<select class="field" name="category"><option>Stadt</option><option>Strand</option><option>Berge</option><option>Verkehr</option><option>Natur</option><option>Sonstiges</option></select></label>
+        <label class="wide">YouTube-Live- oder Embed-Link<input class="field" name="url" type="url" required placeholder="https://www.youtube.com/watch?v=…"></label>
+      </div>
+      <div class="note" id="formError" style="display:none;color:#ffb2b2"></div>
+      <div class="modalactions"><button class="btn" type="button" id="cancel">Abbrechen</button><button class="btn primary" type="submit">Kamera speichern</button></div>
+    </form>
+  </div>
+</div>
+
+<script src="https://unpkg.com/three"></script>
+<script src="https://unpkg.com/globe.gl"></script>
+<script>
+(() => {
+ const $ = id => document.getElementById(id);
+ const views={cams:$('camsView'),planes:$('planesView'),ships:$('shipsView')};
+ const tabs={cams:$('camsTab'),planes:$('planesTab'),ships:$('shipsTab')};
+ function showView(which){Object.keys(views).forEach(k=>{views[k].hidden=k!==which;tabs[k].classList.toggle('primary',k===which);});if(which==='cams'&&globe){setTimeout(()=>globe.width($('globe').clientWidth).height($('globe').clientHeight),80);}}
+ tabs.cams.addEventListener('click',()=>showView('cams'));
+ tabs.planes.addEventListener('click',()=>showView('planes'));
+ tabs.ships.addEventListener('click',()=>showView('ships'));
+
+ const STORE='worldcams_user_cameras_v1';
+ let cameras=[];
+ try{cameras=JSON.parse(localStorage.getItem(STORE)||'[]');if(!Array.isArray(cameras))cameras=[];}catch(e){cameras=[];}
+ let selected=null, globe=null;
+ const demo=[
+  {name:'Zürich',place:'Schweiz',lat:47.3769,lng:8.5417,category:'Stadt',demo:true},
+  {name:'New York',place:'USA',lat:40.7128,lng:-74.006,category:'Stadt',demo:true},
+  {name:'Rio de Janeiro',place:'Brasilien',lat:-22.9068,lng:-43.1729,category:'Strand',demo:true},
+  {name:'Tokio',place:'Japan',lat:35.6762,lng:139.6503,category:'Stadt',demo:true},
+  {name:'Sydney',place:'Australien',lat:-33.8688,lng:151.2093,category:'Strand',demo:true},
+  {name:'Reykjavík',place:'Island',lat:64.1466,lng:-21.9426,category:'Natur',demo:true},
+  {name:'Kapstadt',place:'Südafrika',lat:-33.9249,lng:18.4241,category:'Strand',demo:true},
+  {name:'Dubai',place:'Vereinigte Arabische Emirate',lat:25.2048,lng:55.2708,category:'Stadt',demo:true}
+ ];
+ function safeSave(){try{localStorage.setItem(STORE,JSON.stringify(cameras));}catch(e){alert('Speichern ist in diesem Browser nicht verfügbar.');}}
+ function filtered(){
+  const q=$('search').value.trim().toLocaleLowerCase('de'), cat=$('category').value;
+  return cameras.filter(c=>(cat==='Alle'||c.category===cat)&&(!q||(c.name+' '+c.place+' '+c.category).toLocaleLowerCase('de').includes(q)));
+ }
+ function refresh(){
+  $('total').textContent=cameras.length;
+  $('livecount').textContent=cameras.filter(c=>c.embed).length;
+  const list=filtered();
+  $('camlist').innerHTML='';
+  if(!list.length){$('camlist').innerHTML='<div class="empty">Keine gespeicherten Kameras für diese Suche. Nutze „Kamera hinzufügen“.</div>';}
+  list.forEach(c=>{
+   const b=document.createElement('button');b.className='camitem'+(selected&&selected.id===c.id?' active':'');
+   b.innerHTML='<b></b><small></small>';
+   b.querySelector('b').textContent=c.name;
+   b.querySelector('small').textContent=c.place+' · '+c.category;
+   b.addEventListener('click',()=>selectCamera(c));$('camlist').appendChild(b);
+  });
+  if(globe)drawPoints();
+ }
+ function allPoints(){return [...demo.map(d=>({...d,id:'demo-'+d.name})),...cameras];}
+ function drawPoints(){
+  const q=$('search').value.trim().toLocaleLowerCase('de'),cat=$('category').value;
+  const points=allPoints().filter(c=>(c.demo||((cat==='Alle'||c.category===cat)&&(!q||(c.name+' '+c.place+' '+c.category).toLocaleLowerCase('de').includes(q)))));
+  globe.pointsData(points);
+ }
+ function selectCamera(c){
+  selected=c;refresh();
+  const box=$('detail');box.innerHTML='';
+  const h=document.createElement('h3');h.textContent=c.name;box.appendChild(h);
+  const p=document.createElement('p');p.textContent=c.place+' · '+c.category+(c.demo?' · Beispielort (keine Livecam)':' · gespeicherter Eintrag');box.appendChild(p);
+  const player=document.createElement('div');player.className='player';
+  if(c.embed&&!c.demo){
+   const frame=document.createElement('iframe');frame.src=c.embed;frame.title='Livecam '+c.name;frame.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';frame.allowFullscreen=true;referrerPolicy='strict-origin-when-cross-origin';player.appendChild(frame);
+  }else{player.textContent=c.demo?'Beispielort – noch kein echter Kamerastream verknüpft.':'Kein gültiger Videolink gespeichert.';}
+  box.appendChild(player);
+  if(!c.demo){
+   const row=document.createElement('div');row.style.cssText='display:flex;gap:7px;flex-wrap:wrap;margin-top:9px';
+   const del=document.createElement('button');del.className='btn small';del.textContent='Kamera löschen';del.addEventListener('click',()=>{if(confirm('Diese Kamera von diesem Gerät löschen?')){cameras=cameras.filter(x=>x.id!==c.id);selected=null;safeSave();$('detail').innerHTML='<h3>Kamera gelöscht</h3><p>Der Eintrag wurde von diesem Gerät entfernt.</p><div class="player">Kein Stream ausgewählt.</div>';refresh();}});
+   row.appendChild(del);box.appendChild(row);
+  }
+  globe.pointOfView({lat:c.lat,lng:c.lng,altitude:1.55},900);
+ }
+ function youtubeEmbed(raw){
+  let u;try{u=new URL(raw);}catch(e){return null;}
+  const host=u.hostname.replace(/^www\./,'');
+  let id='';
+  if(host==='youtu.be')id=u.pathname.split('/').filter(Boolean)[0]||'';
+  else if(host==='youtube.com'||host==='m.youtube.com'||host==='youtube-nocookie.com'){
+   if(u.pathname==='/watch')id=u.searchParams.get('v')||'';
+   else if(u.pathname.startsWith('/embed/'))id=u.pathname.split('/')[2]||'';
+   else if(u.pathname.startsWith('/live/'))id=u.pathname.split('/')[2]||'';
+  } else return null;
+  if(!/^[\w-]{6,20}$/.test(id))return null;
+  return 'https://www.youtube-nocookie.com/embed/'+id;
+ }
+ function openModal(){$('modal').classList.add('open');}
+ function closeModal(){$('modal').classList.remove('open');$('formError').style.display='none';}
+ $('addOpen').addEventListener('click',openModal);$('cancel').addEventListener('click',closeModal);
+ $('modal').addEventListener('click',e=>{if(e.target===$('modal'))closeModal();});
+ $('search').addEventListener('input',refresh);$('category').addEventListener('change',refresh);
+ $('reset').addEventListener('click',()=>{globe.pointOfView({lat:20,lng:10,altitude:2.4},900);$('search').value='';$('category').value='Alle';selected=null;refresh();$('detail').innerHTML='<h3>Noch keine Kamera ausgewählt</h3><p>Wähle einen gespeicherten Kamerapunkt aus oder füge eine öffentliche Webcam hinzu.</p><div class="player">Hier erscheint der ausgewählte Stream.</div>';});
+ $('cameraForm').addEventListener('submit',e=>{
+  e.preventDefault();const f=new FormData(e.currentTarget);
+  const embed=youtubeEmbed(String(f.get('url')).trim());
+  if(!embed){$('formError').textContent='Bitte einen gültigen YouTube-Link (watch, live oder embed) eingeben. Andere Player werden in dieser Version noch nicht unterstützt.';$('formError').style.display='block';return;}
+  const c={id:'cam-'+Date.now()+'-'+Math.random().toString(36).slice(2,7),name:String(f.get('title')).trim(),place:String(f.get('place')).trim(),lat:Number(f.get('lat')),lng:Number(f.get('lng')),category:String(f.get('category')),embed};
+  if(!c.name||!c.place||!Number.isFinite(c.lat)||!Number.isFinite(c.lng)){return;}
+  cameras.push(c);safeSave();closeModal();e.currentTarget.reset();$('search').value='';$('category').value='Alle';refresh();selectCamera(c);
+ });
+ function startGlobe(){
+  if(typeof Globe!=='function'){ $('globe').innerHTML='<div style="padding:25px;color:#ffb2b2">Der 3D-Globus konnte nicht geladen werden. Bitte Internetverbindung prüfen und Seite neu laden.</div>';return;}
+  const el=$('globe');
+  globe=Globe()(el)
+   .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+   .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
+   .backgroundColor('#06101d').showAtmosphere(true).atmosphereColor('#42bfff').atmosphereAltitude(.18)
+   .pointsData(allPoints()).pointLat(d=>d.lat).pointLng(d=>d.lng)
+   .pointColor(d=>d.demo?'#8da6bd':'#51dcff').pointAltitude(d=>d.demo?.012:.035).pointRadius(d=>d.demo?.22:.42).pointResolution(12)
+   .pointLabel(d=>`<div style="background:#0b1a2b;color:#edf7ff;padding:8px 10px;border:1px solid #51dcff;border-radius:8px"><b>${String(d.name).replace(/[&<>"]/g,'')}</b><br>${String(d.place).replace(/[&<>"]/g,'')}<br><small>${d.demo?'Beispielort – keine Livecam':'Kamera auswählen'}</small></div>`)
+   .onPointClick(d=>{if(!d.demo)selectCamera(d);else{globe.pointOfView({lat:d.lat,lng:d.lng,altitude:1.7},900);$('detail').innerHTML='<h3>'+d.name+'</h3><p>'+d.place+' · Beispielort</p><div class="player">An diesem Beispielort ist noch keine Livecam gespeichert.</div>';selected=null;refresh();}});
+  globe.controls().autoRotate=true;globe.controls().autoRotateSpeed=.32;globe.pointOfView({lat:20,lng:10,altitude:2.4},0);
+  const resize=()=>{if(globe)globe.width(el.clientWidth).height(el.clientHeight);};window.addEventListener('resize',resize);setTimeout(resize,200);
+ }
+ startGlobe();refresh();
+})();
+</script>
+</body>
+</html>
